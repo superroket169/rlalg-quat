@@ -1,6 +1,11 @@
-use std::ops::{
+#![cfg_attr(not(test), no_std)]
+
+use core::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
+
+mod quat;
+pub use quat::Quat;
 
 /// The [`Sqrt`] trait, when implemented, enables  [`Vector::mag`]  for [`Vector`] types.
 ///
@@ -80,8 +85,18 @@ impl_sqrt! {
     [u32, isqrt],
     [u64, isqrt],
     [u128, isqrt],
-    [f32, sqrt],
-    [f64, sqrt],
+}
+
+impl Sqrt for f32 {
+    fn sqrt(&self) -> Self {
+        libm::sqrtf(*self)
+    }
+}
+
+impl Sqrt for f64 {
+    fn sqrt(&self) -> Self {
+        libm::sqrt(*self)
+    }
 }
 
 /// impl_numeric! {}
@@ -442,7 +457,7 @@ macro_rules! impl_vec {
 
 /// Two component vector
 #[allow(non_camel_case_types)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct v2<T: Component> {
     pub x: T,
     pub y: T,
@@ -458,7 +473,7 @@ impl<T: Component> Vector<T, 2> for v2<T> {}
 
 /// Three component vector
 #[allow(non_camel_case_types)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct v3<T: Component> {
     pub x: T,
     pub y: T,
@@ -476,7 +491,7 @@ impl<T: Component> Vector<T, 3> for v3<T> {}
 
 /// Four component vector
 #[allow(non_camel_case_types)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct v4<T: Component> {
     pub x: T,
     pub y: T,
